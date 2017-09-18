@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+    <meta charset="utf-8">
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <meta charset="utf-8">
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+    <script src="topojson.js"></script>
+    <script src="./js/colorbrewer.js"></script>
+    <script src="./js/cartogram.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <title>World wealty</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- <script type="text/javascript" src="js/d3/d3.js"></script> -->
+    <link href="./bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+    body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+    }
+
+    .ui-slider-horizontal {
+        height: 8px;
+        width: 400px;
+    }
+
+    .ui-slider .ui-slider-handle {
+        height: 15px;
+        width: 5px;
+        padding-left: 5px;
+    }
+
+    body {
+        color: #666;
+        background: #f3f3f3;
+        font: normal 10px "Helvetica Neue", Helvetica, sans-serif;
+        margin: 2em;
+    }
+
+    #map {
+        border: 1px solid #000;
+        width: 1200px;
+        height: 500px;
+    }
+
+    .country {
+        fill: #ccc;
+        stroke: #fff;
+        stroke-width: .5px;
+        stroke-linejoin: round;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    div.tooltip {
+        color: #222;
+        background: #fff;
+        padding: .5em;
+        text-shadow: #f5f5f5 0 1px 0;
+        border-radius: 2px;
+        box-shadow: 0px 0px 2px 0px #a6a6a6;
+        opacity: 0.9;
+        position: absolute;
+    }
+
+    .graticule {
+        fill: none;
+        stroke: #000;
+        stroke-opacity: .3;
+        stroke-width: .5px;
+    }
+
+    .graticule.outline {
+        stroke: #333;
+        stroke-opacity: 1;
+        stroke-width: 1.5px;
+    }
+
+
+    #tooltipp p {
+        margin: 0;
+        font-family: sans-serif;
+        font-size: 16px;
+        line-height: 20px;
+    }
+
+	.axis path,
+	.axis line {
+		fill: none;
+		stroke: #000;
+		shape-rendering: crispEdges;
+	}
+
+	.grid .tick {
+		stroke: lightgrey;
+		opacity: 0.7;
+	}
+	.grid path {
+		stroke-width: 0;
+	}
+
+	.Rect_Kai {
+	}
+    </style>
+    <link href="./bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="brand" href="#">Project introduction</a>
+                <div class="nav-collapse collapse">
+                    <ul class="nav">
+                        <li class="active"><a href="#"><i class="icon-home icon-white"></i>Home</a></li>
+                        <li>
+                            <a href="./da.html"> <i class="icon-question-sign icon-white"></i>Cartograms</a>
+                        </li>
+                        <li><a href="#pie"><i class="icon-question-sign icon-white"></i>Pie</a></li>
+                        <li><a href="#help"><i class="icon-question-sign icon-white"></i>Help</a></li>
+                        <li><a href="#about"><i class="icon-info-sign icon-white"></i>About</a></li>
+                        <li><a href="#contact"><i class="icon-user icon-white"></i>Contact us</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <section id='#' class="section dark" style="height:700px">
+        <h1 id="title">World gini coefficient in 2005</h1>
+        <button id="b_1979" }>1979</button>
+        <button id="b_1980">1980</button>
+        <button id="b_1985">1985</button>
+        <button id="b_1990">1990</button>
+        <button id="b_1995">1995</button>
+        <button id="b_2000">2000</button>
+        <button id="b_2001">2001</button>
+        <button id="b_2002">2002</button>
+        <button id="b_2005">2005</button>
+        <button id="b_2006">2006</button>
+        <button id="b_2007">2007</button>
+        <br>
+        <br>
+        <div id="map"></div>
+        <div id="timeline">
+            <p> Your can type in a year between 1978 - 2007:
+                <input type="text" id="text_input" value="2005" />
+                <button onclick="function(){$('#text_input').trigger(" change ");}">Go to this year!</button>
+                <button onclick="autoPlay()" id="autoplay"> auto play</button>
+            </p>
+            <div id="slider">
+            </div>
+        </div>
+	<script>
+	$(function() {
+		$("#slider").slider({
+			max: 2007,
+			min: 1978,
+			value: 2005,
+			change: function(event, ui) {
+				if (ui.value == year) return;
+				$("#text_input").val(ui.value);
+				update(ui.value);
+			}
+		});
+
+		$("#text_input").change(function() {
+			$("#slider").slider("value", $("#text_input").val());
+		});
+	});
+
+	var timer = undefined;
+
+	function autoPlay() {
+		if (timer != undefined) {
+			clearInterval(timer);
+			timer = undefined;
+			$('#autoplay').html("auto play")
+
+		} else {
+			$('#autoplay').html("Stop")
+			var i = $('#slider').slider("option", "value");
+			timer = setInterval(function() {
+				i = i + 2;
+				if (i > 2007) {
+					clearInterval(timer);
+					$('#autoplay').html("auto play")
+				}
+				$("#slider").slider("value", i);
+			}, 1000);
+		}
+	};
+
+	function update(value) {
+		year = value;
+		d3.select("h1").html("World gini coefficient in " + year)
+		map(year);
+	};
+	var current_country_transfer = "Brazil";
+	var current_year_transfer = 2005;
+
+
+	var width = 1200,
+		height = 500;
+	var click = false;
+
+	var color = d3.scale.category10();
+
+	var projection = d3.geo.mercator()
+		.translate([480, 300])
+		.scale(150);
+
+	var path = d3.geo.path()
+		.projection(projection);
+
+	var tooltip = d3.select("#map").append("div")
+		.attr("class", "tooltip");
+
+	b_1979.onclick = function() {
+		click = true;
+		year = "1979";
+		update(year);
+	}
+	b_1980.onclick = function() {
+		click = true;
+		year = "1980";
+		update(year);
+	}
+	b_1985.onclick = function() {
+		click = true;
+		year = "1985";
+		update(year);
+	}
+	b_1990.onclick = function() {
+		click = true;
+		year = "1990";
+		update(year);
+	}
+	b_1995.onclick = function() {
+		click = true;
+		year = "1995";
+		update(year);
+	}
+	b_2000.onclick = function() {
+		click = true;
+		year = "2000";
+		update(year);
+	}
+	b_2001.onclick = function() {
+		click = true;
+		year = "2001";
+		update(year);
+	}
+	b_2002.onclick = function() {
+		click = true;
+		year = "2002";
+		update(year);
+	}
+	b_2005.onclick = function() {
+		click = true;
+		year = "2005";
+		update(year);
+	}
+	b_2006.onclick = function() {
+		click = true;
+		year = "2006";
+		update(year);
+	}
+	b_2007.onclick = function() {
+		click = true;
+		year = "2007";
+		update(year);
+	}
+
+	window.onload = function() {
+		year = "2005"; // The year shown on page load
+		map(year);
+	}
+	var svg = d3.select("#map").append("svg")
+		.attr("width", width)
+		.attr("height", height)
+		.call(d3.behavior.zoom()
+			.on("zoom", redraw))
+		.append("g");
+	for (var i = 0; i < 8; i++) {
+
+		var text = svg.append("text")
+			.attr("x", 45)
+			.attr("y", 500 - 15 * i + 9)
+			.text(function() {
+				if (i == 0) {
+					return "no value";
+				}
+				if (i == 1) {
+					return "55-60";
+				}
+				if (i == 2) {
+					return "50-55";
+				}
+
+				if (i == 3) {
+					return "45-50";
+				}
+				if (i == 4) {
+					return "40-45";
+				}
+				if (i == 5) {
+					return "35-40";
+				}
+				if (i == 6) {
+					return "30-35";
+				}
+				if (i == 7) {
+					return "25-30";
+				}
+
+			})
+		var rect = svg.append("rect")
+			.attr("x", 10)
+			.attr("y", 500 - 15 * i)
+			.attr("width", 30)
+			.attr("height", 12)
+			.attr("fill", function() {
+
+				if (i == 0) {
+					return "#BDBDBD";
+				}
+				if (i == 1) {
+					return "#DF0101";
+				}
+				if (i == 2) {
+					return "#FE642E";
+				}
+
+				if (i == 3) {
+					return "#F7BE81";
+				}
+				if (i == 4) {
+					return "#F6E3CE";
+				}
+				if (i == 5) {
+					return "#D8F781";
+				}
+				if (i == 6) {
+					return "#40FF00";
+				}
+				if (i == 7) {
+					return "#31B404";
+				}
+			})
+	}
+
+
+	function redraw() {
+		svg.selectAll(".country").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+	}
+
+
+	function map(year) {
+		if (click == true) {
+			svg.selectAll(".country").remove();
+		}
+		queue()
+			.defer(d3.json, "world-110m.json")
+			.defer(d3.tsv, "world-country-names.tsv")
+			.defer(d3.csv, "gini-2.csv")
+			.await(ready);
+
+		function ready(error, world, names, ginidata) {
+
+			var countries = topojson.object(world, world.objects.countries).geometries,
+				neighbors = topojson.neighbors(world, countries),
+				i = -1,
+				n = countries.length;
+			var c = 0
+			var cc = 0
+			countries.forEach(function(d) {
+					d.year = year;
+					var tryit = names.filter(function(n) {
+						return d.id == n.id;
+					})[0];
+					if (typeof tryit === "undefined") {
+						d.name = "Undefined";
+					} else {
+						d.name = tryit.name;
+					}
+					var trydata = ginidata.filter(function(g) {
+						return g["GINI index"] == d.name;
+					})[0]
+
+					if (typeof trydata === "undefined") {
+						d.gini = "";
+					} else {
+						cc++;
+						if (trydata[year] == "") {
+							d.gini = ""
+							c++;
+						} else {
+							d.gini = trydata[year];
+						}
+					}
+
+				})
+				// console.log(c,cc)
+
+			var country = svg.selectAll(".country").data(countries);
+
+			// console.log(year)
+
+			country
+				.enter()
+				.insert("path")
+				.attr("class", "country")
+				.attr("title", function(d, i) {
+					return d.name;
+				})
+				.attr("d", path)
+				.style("fill", function(d) {
+					return ginicolor(d.gini)
+				});
+			//Show/hide tooltip
+			country
+				.on("mousemove", function(d, i) {
+					//  console.log(d.name)
+					var mouse = d3.mouse(svg.node()).map(function(d) {
+						return parseInt(d);
+					});
+					tooltip
+						.classed("hidden", false)
+						.attr("style", "left:" + (mouse[0] + 15) + "px;top:" + (mouse[1] + 100) + "px")
+						.html(d.name + "\n" + "gini coefficient in the year  " + d.year + " is:" + d.gini)
+				})
+				.on("click", function(d) {
+					document.getElementById("current_country").value = d.name;
+					document.getElementById("current_year").value = d.year;
+
+					console.log(document.getElementById("current_country").value);
+				})
+				.on("mouseout", function(d, i) {
+					tooltip.classed("hidden", true)
+				})
+
+
+			function ginicolor(gini) {
+				if (gini == "") {
+					return "#BDBDBD"
+					console.log(year + "ddddd");
+
+				}
+				if (gini >= 25 && gini <= 30) {
+					return "#31B404"
+				}
+				if (gini > 30 && gini <= 35) {
+					return "#40FF00"
+				}
+				if (gini > 35 && gini <= 40) {
+					return "#D8F781"
+				}
+				if (gini > 40 && gini <= 45) {
+					return "#F6E3CE"
+				}
+				if (gini > 45 && gini <= 50) {
+					return "#F7BE81"
+				}
+				if (gini > 50 && gini <= 55) {
+					return "#FE642E"
+				}
+				if (gini > 55 && gini <= 60) {
+					return "#DF0101"
+				}
+			}
+		}
+	}
+	</script>
+
+    </section>
+    <section id="gdp" class="section dark" style="height:750px">
+	<form name="myform">
+	<label><input type="radio" name="mode" value="grouped"> Grouped</label>
+	<label><input type="radio" name="mode" value="stacked" checked> Stacked</label>
+	<label id="current_country" value="China" />
+	<label id="current_year" value="2005" />
+
+	<label><input type="radio" name="country" value="China-Brazil" checked> China-Brazil</label>
+	<label><input type="radio" name="country" value="China-India" > China-India</label>
+	<label><input type="radio" name="country" value="China-Russia" > China-Russia</label>
+	<label id="current_country" value="China" />
+	<label id="current_year" value="2005" />
+
+	</form>
+        <div id="gini"></div>
+        </div>
+	<script>
+var n = 5, // number of layers
+	m = 2, // number of samples per layer
+//error in reading the data
+country = "China";
+year = 2005;
+var data1,data2,data3,data4,data5;
+var first = [];
+var samples = [];
+var margin = {top: 100, right: 20, bottom: 40, left: 17},
+width = 960 - margin.left - margin.right,
+height = 750 - margin.top - margin.bottom;
+d3.tsv("data/first.tsv").row(function(d){
+	return {
+		name: d["Income share"],
+		"1979" : +d["1979"],
+		"1980" : +d["1980"],
+		"1985" : +d["1985"],
+		"1990" : +d["1990"],
+		"1995" : +d["1995"],
+		"2000" : +d["2000"],
+		"2001" : +d["2001"],
+		"2002" : +d["2002"],
+		"2005" : +d["2005"],
+		"2006" : +d["2006"],
+		"2007" : +d["2007"]
+	};
+})
+.get(function(error, rows){
+	first = rows;
+	console.log(first.length);
+	d3.tsv("data/second.tsv").row(function(d){
+		return {
+			name: d["Income share held by second 20%"],
+		"1979" : +d["1979"],
+		"1980" : +d["1980"],
+		"1985" : +d["1985"],
+		"1990" : +d["1990"],
+		"1995" : +d["1995"],
+		"2000" : +d["2000"],
+		"2001" : +d["2001"],
+		"2002" : +d["2002"],
+		"2005" : +d["2005"],
+		"2006" : +d["2006"],
+		"2007" : +d["2007"]
+		};
+	})
+	.get(function(error, rows){
+		second = rows;
+		console.log(second.length);
+		d3.tsv("data/third.tsv").row(function(d){
+			return {
+				name: d["Income share held by third 20%"],
+				"1979" : +d["1979"],
+				"1980" : +d["1980"],
+				"1985" : +d["1985"],
+				"1990" : +d["1990"],
+				"1995" : +d["1995"],
+				"2000" : +d["2000"],
+				"2001" : +d["2001"],
+				"2002" : +d["2002"],
+				"2005" : +d["2005"],
+				"2006" : +d["2006"],
+				"2007" : +d["2007"]
+			};
+		})
+		.get(function(error, rows){
+			third = rows;
+			console.log(third.length);
+			d3.tsv("data/fourth.tsv").row(function(d){
+				return {
+					name: d["Income share held by fourth 20%"],
+					"1979" : +d["1979"],
+					"1980" : +d["1980"],
+					"1985" : +d["1985"],
+					"1990" : +d["1990"],
+					"1995" : +d["1995"],
+					"2000" : +d["2000"],
+					"2001" : +d["2001"],
+					"2002" : +d["2002"],
+					"2005" : +d["2005"],
+					"2006" : +d["2006"],
+					"2007" : +d["2007"]
+				};
+			})
+			.get(function(error, rows){
+				fourth = rows;
+
+				console.log(fourth.length);
+				d3.tsv("data/highest.tsv").row(function(d){
+					return {
+						name: d["Income share held by highest 20%"],
+						"1979" : +d["1979"],
+						"1980" : +d["1980"],
+						"1985" : +d["1985"],
+						"1990" : +d["1990"],
+						"1995" : +d["1995"],
+						"2000" : +d["2000"],
+						"2001" : +d["2001"],
+						"2002" : +d["2002"],
+						"2005" : +d["2005"],
+						"2006" : +d["2006"],
+						"2007" : +d["2007"]
+					};
+				})
+				.get(function(error, rows){
+					highest = rows;
+
+					country = "China";
+					year = current_year_transfer;
+					var piece1 = first.filter(function(d) { return d.name == country});
+					var piece2 = second.filter(function(d) { return d.name == country});
+					var piece3 = third.filter(function(d) { return d.name == country});
+					var piece4 = fourth.filter(function(d) { return d.name == country});
+					var piece5 = highest.filter(function(d) { return d.name == country});
+					data11 = piece1[0][year];
+					data21 = piece2[0][year];
+					data31 = piece3[0][year];
+					data41 = piece4[0][year];
+					data51 = piece5[0][year];
+					samples1 = [[data1],[data2],[data3],[data4],[data5]];
+
+
+					country = "Brazil";
+					var piece1 = first.filter(function(d) { return d.name == country});
+					var piece2 = second.filter(function(d) { return d.name == country});
+					var piece3 = third.filter(function(d) { return d.name == country});
+					var piece4 = fourth.filter(function(d) { return d.name == country});
+					var piece5 = highest.filter(function(d) { return d.name == country});
+					data12 = piece1[0][year];
+					data22 = piece2[0][year];
+					data32 = piece3[0][year];
+					data42 = piece4[0][year];
+					data52 = piece5[0][year];
+					samples = [[data11,data12],[data21,data22],[data31,data32],[data41,data42],[data51,data52]];
+
+
+
+					console.log(samples);
+
+					var stack = d3.layout.stack(),
+					yGroupMax = 100,
+					yStackMax = 100;
+					console.log(samples);
+
+					var smap = samples.map(function(d){ return d.map(function(d, i) { return {x: i, y: d}; })});
+					var layers = stack(smap);
+
+
+					var x = d3.scale.ordinal()
+					.domain(d3.range(m))
+					.rangeRoundBands([0, width], .08);
+
+					var y = d3.scale.linear()
+					.domain([0, yStackMax])
+					.range([height, 0]);
+
+					var color = d3.scale.linear().domain([0,  n-2])
+							.range(['red','orange']);
+
+					var xScale = d3.scale.ordinal()
+					.domain(d3.range(m*n))
+					.rangeRoundBands([0, width], .08);
+
+					var xAxis = d3.svg.axis()
+					.scale(x)
+					.tickSize(2)
+					.tickPadding(6)
+					.orient("bottom");
+
+					var yAxisLeft = d3.svg.axis().scale(y)
+					.orient("left").ticks(5);
+
+
+					var svg = d3.select("#gini").append("svg")
+					.attr("width", width + margin.left + margin.right)
+					.attr("height", height + margin.top + margin.bottom)
+					.append("g")
+					.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+					var layer = svg.selectAll(".layer")
+					.data(layers)
+					.enter().append("g")
+					.attr("class", "layer")
+					.style("fill", function(d, i) { return color(i); });
+
+
+					var rect = layer.selectAll(".Rect_Kai")
+					.data(function(d) { return d; })
+					.enter().append("rect")
+					.attr("class","Rect_Kai")
+					.attr("x", function(d) { return x(d.x); })
+					.attr("y", height)
+					.attr("width", x.rangeBand())
+					.attr("height", 0);
+
+
+					rect.transition()
+					.delay(function(d, i) { return i * 10; })
+					.attr("y", function(d) { return y(d.y0 + d.y); })
+					.attr("height", function(d) { return y(d.y0) - y(d.y0 + d.y); });
+
+
+					svg.append("g")
+					.attr("class", "yaxis")
+					.attr("transform", "translate(" + margin.left + "," +  (height) + ")")
+					.call(xAxis);
+
+					svg.append("g")
+					.attr("class", "yaxis")
+					.attr("transform","translate(" + margin.left + "," + 0+ ")")
+					.call(yAxisLeft);
+
+					svg.append("text")
+						.attr("x", (width / 2))
+						.attr("y", 0 - (margin.top / 3))
+						.attr("text-anchor", "middle")
+						.style("font-size", "32px")
+						//.text("Wealth Distribution of "+ country+ " in " + year);
+						.text("Wealth Distribution in 2005");
+
+
+					d3.selectAll("input").on("change", change);
+
+
+
+					var timeout = setTimeout(function() {
+						d3.select("input[value=\"grouped\"]").property("checked", true).each(change);
+					}, 2000);
+
+					function change() {
+						clearTimeout(timeout);
+						if (this.value === "grouped") transitionGrouped();
+						else if (this.value === "stacked") transitionStacked();
+
+						else if(this.value === "China-Brazil"){
+							country1 = "China";
+							country2 = "Brazil";
+							paint();
+						}
+						else if(this.value === "China-India"){
+							country1 = "China";
+							country2 = "India";
+							paint();
+						}
+						else if(this.value === "China-Russia"){
+							country1 = "China";
+							country2 = "Russia";
+							paint();
+						}
+					}
+					function paint(){
+						var piece1 = first.filter(function(d) { return d.name == country1});
+						var piece2 = second.filter(function(d) { return d.name == country1});
+						var piece3 = third.filter(function(d) { return d.name == country1});
+						var piece4 = fourth.filter(function(d) { return d.name == country1});
+						var piece5 = highest.filter(function(d) { return d.name == country1});
+						data11 = piece1[0][year];
+						data21 = piece2[0][year];
+						data31 = piece3[0][year];
+						data41 = piece4[0][year];
+						data51 = piece5[0][year];
+						samples1 = [[data1],[data2],[data3],[data4],[data5]];
+
+
+						var piece1 = first.filter(function(d) { return d.name == country2});
+						var piece2 = second.filter(function(d) { return d.name == country2});
+						var piece3 = third.filter(function(d) { return d.name == country2});
+						var piece4 = fourth.filter(function(d) { return d.name == country2});
+						var piece5 = highest.filter(function(d) { return d.name == country2});
+						data12 = piece1[0][year];
+						data22 = piece2[0][year];
+						data32 = piece3[0][year];
+						data42 = piece4[0][year];
+						data52 = piece5[0][year];
+						samples = [[data11,data12],[data21,data22],[data31,data32],[data41,data42],[data51,data52]];
+
+						console.log(samples);
+
+						smap = samples.map(function(d){ return d.map(function(d, i) { return {x: i, y: d}; })});
+
+						layers = stack(smap);
+
+						layer = svg.selectAll(".layer")
+						.data(layers)
+						.attr("class", "layer")
+						.style("fill", function(d, i) { return color(i); });
+
+						rect = layer.selectAll(".Rect_Kai")
+						.data(function(d) { return d; })
+						.attr("x", function(d) { return x(d.x); })
+						.attr("y", height)
+						.attr("width", x.rangeBand())
+						.attr("height", 0);
+
+
+						if(myform.mode.value === "stacked")
+						{
+							rect.transition()
+							.delay(function(d, i) { return i * 10; })
+							.attr("y", function(d) { return y(d.y0 + d.y); })
+							.attr("height", function(d) { return y(d.y0) - y(d.y0 + d.y); });
+							}
+						else
+						{
+							rect.transition()
+							.delay(function(d, i) { return i * 10; })
+							.attr("x", function(d, i, j) { return x(d.x) + x.rangeBand() / n * j; })
+							.attr("width", x.rangeBand() / n)
+							.attr("y", function(d) { return y(d.y); })
+							.attr("height", function(d) { return height - y(d.y); });
+						}
+					}
+
+					function transitionGrouped() {
+						y.domain([0, yGroupMax]);
+
+						rect.transition()
+						.duration(500)
+						.delay(function(d, i) { return i * 10; })
+						.attr("x", function(d, i, j) { return x(d.x) + x.rangeBand() / n * j; })
+						.attr("width", x.rangeBand() / n)
+						.transition()
+						.attr("y", function(d) { return y(d.y); })
+						.attr("height", function(d) { return height - y(d.y); });
+
+						yAxisLeft = d3.svg.axis().scale(y)
+						.orient("left").ticks(5);
+						svg.select("yaxis").call(yAxisLeft);
+					}
+
+					function transitionStacked() {
+						y.domain([0, yStackMax]);
+
+						rect.transition()
+						.duration(500)
+						.delay(function(d, i) { return i * 10; })
+						.attr("y", function(d) { return y(d.y0 + d.y); })
+						.attr("height", function(d) { return y(d.y0) - y(d.y0 + d.y); })
+						.transition()
+						.attr("x", function(d) { return x(d.x); })
+						.attr("width", x.rangeBand());
+
+						yAxisLeft = d3.svg.axis().scale(y)
+						.orient("left").ticks(5);
+
+						svg.select("yaxis").call(yAxisLeft);
+					}
+				});
+
+			});
+		});
+	});
+
+});
+
+
+</script>
+    </section>
+	<p></p><p></p><p></p>
+    <section id="pie" class="section dark" style="height:750px">
+        <div class="row">
+            <div id=piee class="span1">
+                <form id="year">
+                    <label>
+                        <input type="radio" name="dataset" value="2015"> 2015</label>
+                    <label>
+                        <input type="radio" name="dataset" value="2000"> 2000</label>
+                    <label>
+                        <input type="radio" name="dataset" value="1950"> 1950</label>
+                    <label>
+                        <input type="radio" name="dataset" value="1900"> 1900</label>
+                    <label>
+                        <input type="radio" name="dataset" value="1850"> 1850</label>
+                    <label>
+                        <input type="radio" name="dataset" value="1800" checked> 1800</label>
+                </form>
+                <div id="tooltip" class="hidden">
+                    <p><span id="name"> <strong> </strong> </span></p>
+                    <p><span id="value"> </span></p>
+                </div>
+            </div>
+            <div id="pie1" class="span5">
+                <script src="pie.js"></script>
+            </div>
+            <div id="pie2" class="span6">
+                <script src="pie2.js"></script>
+            </div>
+        </div>
+    </section>
+    <section id="help" class="section dark" style="height:700px">
+        <div class="container animated hiding" data-animation="fadeInDown">
+            <div style="height:30px">
+                <h1> Do you need help?</h1>
+                <div>
+                </div>
+    </section>
+    <section id="about" class="section dark" style="height:700px">
+        <div class="container animated hiding" data-animation="fadeInDown">
+            <div style="height:30px">
+                <!-- <h1>eee </h1> -->
+            </div>
+            <h1> This is a IGR project</h1>
+        </div>
+    </section>
+    <section id="contact" class="section dark" style="height:600px">
+        <div class="container animated hiding" data-animation="fadeInDown">
+            <div style="height:30px">
+                <!-- <h1>eee </h1> -->
+            </div>
+            <div class="panel panel-default" style="height:50">
+                <h1></h1>
+            </div>
+            <center><span class="label label-primary"><h1> We are Anonymous...</h1></span></center>
+        </div>
+    </section>
+    <div style="background-color:#F2F2F2;height:50px;">
+        <footer class="footer light inverted" style="background-color:#F2F2F2">
+            <p> &copy; igr projet205 june 2016</p>
+        </footer>
+    </div>
+</body>
+
+</html>

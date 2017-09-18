@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<!-- change color -->
+
+<head>
+    <title>Cartograms with d3 &amp; TopoJSON</title>
+    <meta charset="utf-8">
+    <meta property="og:image" content="placeholder.png">
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <!-- bootstrap -->
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/d3.geo.projection.v0.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+    <script src="./js/colorbrewer.js"></script>
+    <script src="./js/cartogram.js"></script>
+    <link href="./bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style>
+    .ui-slider-horizontal {
+        height: 8px;
+        width: 400px;
+    }
+    
+    .ui-slider .ui-slider-handle {
+        height: 15px;
+        width: 5px;
+        padding-left: 5px;
+    }
+    
+    h1 {
+        font-size: 200%;
+        font-family: "Garamond";
+        margin: 0 0 15px 0;
+    }
+    
+    .hidden {
+        display: none;
+    }
+    
+    div.tooltip {
+        color: #222;
+        background: #fff;
+        padding: .5em;
+        text-shadow: #f5f5f5 0 1px 0;
+        border-radius: 2px;
+        box-shadow: 0px 0px 2px 0px #a6a6a6;
+        opacity: 0.9;
+        position: absolute;
+    }
+    
+    .country {
+        fill: #ccc;
+        stroke: #fff;
+        stroke-width: .5px;
+        stroke-linejoin: round;
+    }
+    
+    .graticule {
+        fill: none;
+        stroke: #000;
+        stroke-opacity: .3;
+        stroke-width: .5px;
+    }
+    
+    .graticule.outline {
+        stroke: #333;
+        stroke-opacity: 1;
+        stroke-width: 1.5px;
+    }
+    </style>
+    <title></title>
+</head>
+
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="brand" href="#">Project introduction</a>
+                <div class="nav-collapse collapse">
+                    <ul class="nav">
+                        <li><a href="#"><i class="icon-home icon-white"></i>Home</a></li>
+                        <li><a href="./index.html#gdp"><i class="icon-question-sign icon-white"></i>GDP MAP</a></li>
+                        <li class="active">
+                            <a href="./da.html"> <i class="icon-question-sign icon-white"></i>Cartograms</a>
+                        </li>
+                        <li><a href="./index.html#pie"><i class="icon-question-sign icon-white"></i>Pie</a></li>
+                        <li><a href="./index.html#help"><i class="icon-question-sign icon-white"></i>Help</a></li>
+                        <li><a href="./index.html#about"><i class="icon-info-sign icon-white"></i>About</a></li>
+                        <li><a href="./index.html#contact"><i class="icon-user icon-white"></i>Contact us</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <h1 id="title">When the world was in 2015</h1>
+        <h1>Cartograms of Visualization of GDP per Capita</h1>
+        <div id="map" width=480>
+            <svg> </svg>
+        </div>
+        <div>
+            <div id="slider">
+            </div>
+            <p> Your can type in a year between 1800 - 2015:
+                <input type="text" id="text_input" value="2015" />
+                <button onclick="function(){$('#text_input').trigger(" change ");}">Go to this year!</button>
+                <button onclick="autoPlay()" id="autoplay"> auto play</button>
+            </p>
+            <p>Great Credits to cartogram.js</p>
+            <a href="./index.html"> back</a>
+        </div>
+</body>
+<script src="./js/Draw_map.js"></script>
+
+</html>
